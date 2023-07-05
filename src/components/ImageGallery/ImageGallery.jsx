@@ -8,21 +8,26 @@ import Message from 'components/Message/Message';
 
 class ImageGallery extends Component {
   state = {
-    queryString: this.props.query,
-    page: 1,
+    queryString: '',
+    page: 0,
     totalHits: 1,
     per_page: 12,
     showMore: false,
     galleryItems: [],
   };
 
-  // componentDidMount() {
-  //   this.setState({ page: 1 });
-  // }
+  reset() {
+    this.setState({ queryString: this.props.query, page: 1, galleryItems: [] });
+  }
+
+  componentDidMount() {
+    this.reset();
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.query !== this.props.query) {
-      this.setState({ queryString: this.props.query, page: 1 });
+      this.reset();
+      console.log('set new queryString');
       return;
     }
     if (
