@@ -8,28 +8,33 @@ import Message from 'components/Message/Message';
 
 class ImageGallery extends Component {
   state = {
-    page: 0,
+    queryString: this.props.query,
+    page: 1,
     totalHits: 1,
     per_page: 12,
     showMore: false,
     galleryItems: [],
   };
 
-  componentDidMount() {
-    this.setState({ page: 1 });
-  }
+  // componentDidMount() {
+  //   this.setState({ page: 1 });
+  // }
 
   componentDidUpdate(prevProps, prevState) {
+    if (prevProps.query !== this.props.query) {
+      this.setState({ queryString: this.props.query, page: 1 });
+      return;
+    }
     if (
       this.state.page > prevState.page ||
-      this.props.query !== prevProps.query
+      this.state.queryString !== prevState.queryString
     ) {
       const newPage =
-        this.props.query === prevProps.query ? this.state.page : 1;
+        this.state.queryString === prevState.queryString ? this.state.page : 1;
       const prevGallery = newPage === 1 ? [] : prevState.galleryItems;
 
       this.props.updateLoader(1);
-      fetchImages(this.props.query, newPage)
+      fetchImages(this.state.queryString, newPage)
         .then(response => {
           this.setState({
             galleryItems: [
