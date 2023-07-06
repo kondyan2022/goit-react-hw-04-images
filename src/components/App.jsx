@@ -24,23 +24,13 @@ export const App = () => {
   const [status, setStatus] = useState(STATUS.IDLE);
 
   useEffect(() => {
-    setPage(1);
-    setGalleryItems([]);
-    setShowMore(false);
-  }, [query]);
-
-  useEffect(() => {
     if (!query || page === 0) {
       setStatus(STATUS.IDLE);
       return;
     }
-
-    console.log('Use effect', query, page);
     setStatus(STATUS.PENDING);
-
     fetchImages(query, page)
       .then(response => {
-        console.log(response);
         setGalleryItems(prevGalleryItems => [
           ...(page === 1 ? [] : prevGalleryItems),
           ...response.data.hits.map(
@@ -63,15 +53,20 @@ export const App = () => {
       });
   }, [query, page, perPage]);
 
+  const reset = queryString => {
+    setQuery(queryString);
+    setPage(1);
+    setGalleryItems([]);
+    setShowMore(false);
+  };
+
   const handleSubmit = values => {
     if (query !== values.query) {
-      setQuery(values.query);
+      reset(values.query);
     }
   };
 
   const handleButtonClick = evt => setPage(prevPage => prevPage + 1);
-
-  console.log('App render');
 
   if (status === STATUS.PENDING) {
     return (
