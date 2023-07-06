@@ -1,10 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { ModalForm, ModalOverlay } from './Modal.styled';
 import { disablePageScroll, enablePageScroll } from 'scroll-lock';
+import Loader from 'components/Loader/Loader';
 
-const Modal = ({ largeImageURL, tags, updateLoader, closeModal }) => {
+const Modal = ({ largeImageURL, tags, closeModal }) => {
+  const [loading, setLoading] = useState(false);
+
   const modalRoot = useRef(document.querySelector('#modal-root'));
 
   useEffect(() => {
@@ -15,10 +18,12 @@ const Modal = ({ largeImageURL, tags, updateLoader, closeModal }) => {
     };
     document.addEventListener('keydown', handleKeyDown);
     disablePageScroll();
+    setLoading(true);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       enablePageScroll();
+      setLoading(false);
     };
   }, [closeModal]);
 
@@ -27,6 +32,7 @@ const Modal = ({ largeImageURL, tags, updateLoader, closeModal }) => {
       closeModal();
     }
   };
+
   return createPortal(
     <ModalOverlay onClick={handleBackdropClick}>
       <ModalForm>
@@ -34,13 +40,14 @@ const Modal = ({ largeImageURL, tags, updateLoader, closeModal }) => {
           src={largeImageURL}
           alt={tags}
           onLoad={() => {
-            updateLoader(-1);
+            setLoading(false);
           }}
           onError={() => {
-            updateLoader(-1);
+            setLoading(false);
           }}
         />
       </ModalForm>
+      {loading > 0 && <Loader />}
     </ModalOverlay>,
     modalRoot.current
   );
@@ -51,6 +58,5 @@ export default Modal;
 Modal.propTypes = {
   largeImageURL: PropTypes.string.isRequired,
   tags: PropTypes.string,
-  updateLoader: PropTypes.func,
   closeModal: PropTypes.func,
 };

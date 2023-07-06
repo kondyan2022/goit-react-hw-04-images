@@ -1,44 +1,37 @@
 import PropTypes from 'prop-types';
 import { GalleryItem, GalleryItemImage } from './ImageGalleryItems.styled';
+import { useState } from 'react';
+import Modal from 'components/Modal/Modal';
 
-const ImageGalleryItem = ({
-  webformatURL,
-  largeImageURL,
-  tags,
-  imageClick,
-  updateLoader,
-}) => {
+const ImageGalleryItem = ({ webformatURL, largeImageURL, tags }) => {
+  const [modal, setModal] = useState(false);
+
   const handleClick = evt => {
-    updateLoader(1);
-    imageClick({
-      largeImageURL: largeImageURL,
-      tags: tags,
-    });
+    setModal(true);
+  };
+  const handleCloseModal = () => {
+    setModal(false);
   };
 
   return (
-    <GalleryItem>
-      <GalleryItemImage
-        src={webformatURL}
-        alt={tags}
-        onClick={handleClick}
-        onLoad={() => {
-          updateLoader(-1);
-        }}
-        onError={() => {
-          updateLoader(-1);
-        }}
-      />
-    </GalleryItem>
+    <>
+      <GalleryItem>
+        <GalleryItemImage src={webformatURL} alt={tags} onClick={handleClick} />
+      </GalleryItem>
+      {modal && (
+        <Modal
+          closeModal={handleCloseModal}
+          largeImageURL={largeImageURL}
+          tags={tags}
+        />
+      )}
+    </>
   );
 };
 
-export default ImageGalleryItem;
 ImageGalleryItem.propTypes = {
-  id: PropTypes.number,
   largeImageURL: PropTypes.string,
   webformatURL: PropTypes.string,
   tags: PropTypes.string,
-  imageClick: PropTypes.func,
-  updateLoader: PropTypes.func,
 };
+export default ImageGalleryItem;
